@@ -49,9 +49,17 @@ SETUP INSTRUCTIONS
 
 0a. This new "fcrameri-colors" folder should contain just palette .txt files: acton.txt, bam.txt, bamO.txt, etc.
 
-1. Paste the functions from this repository into your .bash_functions file (or equivalent). Or, place the .bash_xmg_functions file from this repository in an appropriate folder and `source` it in your .bashrc file (or equivalent).
+1. Paste the functions from this repository into your .bash_functions file (or equivalent). Or, place the bash_xmg_functions file from this repository in an appropriate folder and add
+if [ -f /path/to/.bash_xmg_functions ]; then
+  . /path/to/.bash_xmg_functions
+fi
+to your .bashrc file (or equivalent).
 
-1a. What's a .bash_functions file? -- Your .bashrc file (or, on a mac, .zshrc; other Linux distributions have other ".*rc" files) sets options to personalize your terminal, including things like text color, text size, and even any functions you find personally useful that don't come built in. It's typically recommended that functions go in a file other than .bashrc, to avoid cluttering it. You may call this file anything you'd like. I call mine .bash_fns. To make your .bashrc file aware of it, add the line `source /path/to/.bash_fns` (without the ticks ``, and changing the filepath to be the correct one) anywhere in your .bashrc file. Any time you change your .bashrc file, or your .bash_functions file, your terminal won't be aware of it until you `source` that file again.
+1a. What's a .bash_functions file? -- Your .bashrc file (or, on a mac, .zshrc; other Linux distributions have other ".*rc" files) sets options to personalize your terminal, including things like text color, text size, and even any functions you find personally useful that don't come built in. It's typically recommended that functions go in a file other than .bashrc, to avoid cluttering it. You may call this file anything you'd like. I call mine .bash_fns. To make your .bashrc file aware of it, add the lines 
+if [ -f /path/to/.bash_fns ]; then
+  . /path/to/.bash_xmg_functions
+fi
+(changing the filepath to be the correct one) anywhere in your .bashrc file. Any time you change your .bashrc file, or your .bash_functions file, your terminal won't be aware of it until you `source filename` that file again.
 
 2. Both `xmg-fc-col` and `xmg-fc-list-cols` have options that must be set for yourself. These options are at the very top of each one. They may include your Linux distribution (recent MacOS versions are typically zsh), whether or not you are on a mac, the directory with your color palette txt files, or the Default.agr file you'll be changing (see next step). Set these options.
 
