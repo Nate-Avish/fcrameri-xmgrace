@@ -1,0 +1,81 @@
+### xmgrace color functions ###
+
+#lists xmgrace functions and their arg order
+xmg-list() {
+    echo
+    echo "xmg-list: lists xmgrace functions and their argument order"
+    echo "xmg-fc-col \$color_palette_name \$num_series_plotting: clears any colors set in the xmgrace default settings file and
+inserts white, black, and then \$num_series_plotting equally-spaced colors from the specified \$color_palette_name"
+    echo "xmg-fc-list-cols: lists available colors in Fabio Crameri's set"
+}
+
+
+#chooses colors from a given palette and places in the plot's batch file
+xmg-fc-col() {
+
+    ### set the following for yourself, once and for all, when pasting this function:
+    shl=zsh #currently, zsh and bash are supported
+    macos=True #if on a Mac OS. idk if $shl alone specifies this, but seems good to be safe
+    colors_dir=/path/to/fcrameri-colors
+    agr_file=~/.grace/templates/Default.agr
+
+    echo "Given arguments:"
+    echo "chosen color palette: $1"
+    echo "number of series to be plotted: $2"
+
+    ### set the above arguments as variables
+    palette=$1
+    num_series=$2
+
+    ### other variables
+    #number of colors in the palette (typically 256)
+    num_cols=`wc -l $colors_dir/$palette.txt | awk '{print $1}'`
+
+    #line numbers of the colors (equally-spaced)
+    cols_lines=($(seq 1 `echo $(($num_cols/$num_series))` $(echo $(($num_cols-1)))))
+
+    ### next: write the colors to the .agr file!
+    #delete lines defining colors
+    #on Mac OS, `sed -i` means something different than it does in bash, but this additional '' makes it work as expected
+    if test $macos = True; then
+       sed -i '' '/map color*/d' $agr_file
+    else
+       sed -i '/map color*/d' $agr_file
+    fi
+
+    #want a white background and black text, presumably :)
+    echo >> $agr_file
+    echo "@map color 0 to (255, 255, 255), \"white\"" >> $agr_file
+    echo "@map color 1 to (0, 0, 0), \"black\"" >> $agr_file
+    
+    #zsh version (applies to any distro with list numbering (1,$len) inclusive)
+    if test $shl = zsh; then
+       for ((c=1;c<=${#cols_lines[@]};c++)); do
+           c_line=${cols_lines[`echo $(($c))`]}
+           vals=`sed -n "${c_line}p" $colors_dir/$palette.txt | awk '{print int(256*$1)", "int(256*$2)", "int(256*$3)}'`
+           echo "@map color $(echo $(($c+1))) to (${vals}), \"$palette $c_line\"" >> $agr_file
+           echo "@map color $(echo $(($c+1))) to (${vals}), \"$palette $c_line\""
+       done
+    fi
+
+    #bash version (applies to any distro with list numbering (0,$len-1) inclusive)
+    if test $shl = bash; then
+       for ((c=0;c<${#cols_lines[@]};c++)); do
+           c_line=${cols_lines[$c]}
+           vals=`sed -n "${c_line}p" $colors_dir/$palette.txt | awk '{print int(256*$1)", "int(256*$2)", "int(256*$3)}'`
+           echo "@map color $(echo $(($c+2))) to (${vals}), \"$palette $c_line\"" >> $agr_file
+           echo "@map color $(echo $(($c+2))) to (${vals}), \"$palette $c_line\""
+       done
+    fi
+
+    echo "Modification complete!"
+}
+
+xmg-fc-list-cols() {
+    ### set the following for yourself, once and for all, when pasting this function:
+    colors_dir=/path/to/fcrameri-colors
+
+    for c in `ls $colors_dir`; do
+        echo "${c%.*}"
+    done
+}
